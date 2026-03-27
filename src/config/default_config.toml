@@ -1,0 +1,95 @@
+# code-reviewer default configuration
+# Copy this to <repo>/.code-reviewer/config.toml and adjust as needed.
+# IMPORTANT: Never add API keys or tokens here — use environment variables.
+#   CODE_REVIEWER_LLM_API_KEY, CODE_REVIEWER_GIT_TOKEN, etc.
+
+[llm]
+provider = "openai"          # openai | anthropic | ollama | vllm
+model = "gpt-4o"
+temperature = 0.2
+max_tokens_per_task = 100000
+request_timeout_seconds = 120
+max_retries = 3
+
+[embedding]
+provider = "openai"          # openai | ollama
+model = "text-embedding-3-small"
+batch_size = 100
+dimensions = 1536
+
+[vectordb]
+backend = "chromadb"         # chromadb | qdrant
+persist_directory = ".code-reviewer/vectordb"
+collection_name = "codebase"
+similarity_threshold = 0.3
+top_k = 20
+
+[indexing]
+min_chunk_tokens = 30
+max_chunk_tokens = 1500
+target_chunk_tokens = 650
+max_file_tokens = 50000
+context_lines = 3
+include_extensions = [
+  ".py", ".js", ".ts", ".java", ".go", ".rs",
+  ".md", ".txt", ".yaml", ".toml", ".json"
+]
+
+[retrieval]
+top_k = 20
+keyword_weight = 0.3
+similarity_threshold = 0.3
+
+[evaluation]
+profile = "full"             # quick | full | custom
+timeout_seconds = 600
+linter = "ruff"              # ruff | flake8 | pylint
+enable_perf = false
+
+[evaluation.perf]
+regression_threshold_percent = 10.0
+improvement_threshold_percent = 10.0
+warmup_runs = 3
+measurement_runs = 5
+benchmark_timeout_seconds = 60
+baseline_refresh_commits = 50
+
+[scoring]
+weight_correctness = 0.40
+weight_readability = 0.20
+weight_risk = 0.25
+weight_complexity = 0.15
+min_viable_score = 30
+
+[git]
+auth_method = "auto"         # auto | ssh | https_token | credential_helper
+sandbox_retention_days = 7
+default_branch = "main"
+
+[agent]
+max_iterations = 15
+max_refinement_rounds = 3
+
+[server]
+host = "127.0.0.1"
+port = 8000
+reload = false
+workers = 1
+
+[database]
+backend = "sqlite"           # sqlite | postgresql
+sqlite_path = ".code-reviewer/metadata.db"
+auto_migrate = true
+
+[cache]
+backend = "sqlite"           # sqlite | redis
+llm_ttl_hours = 24
+embedding_ttl_days = 7
+max_size_mb = 500
+
+[logging]
+level = "INFO"               # DEBUG | INFO | WARNING | ERROR
+format = "json"              # json | text
+log_dir = ".code-reviewer/logs"
+max_bytes = 52428800         # 50 MB
+backup_count = 5

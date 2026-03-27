@@ -1,0 +1,41 @@
+# Files and directories to exclude from code-reviewer indexing.
+# Uses glob patterns, same syntax as .gitignore.
+
+# Generated / vendored code
+*.min.js
+*.min.css
+*.generated.*
+*_pb2.py
+*_pb2_grpc.py
+
+# Dependencies
+vendor/
+node_modules/
+venv/
+.venv/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Large data files
+*.csv
+*.parquet
+*.h5
+*.pkl
+
+# Media
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.mp4
+*.mp3
+
+# Lock files
+package-lock.json
+poetry.lock
+Pipfile.lock

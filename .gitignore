@@ -1,0 +1,60 @@
+# ─── Python ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.eggs/
+
+# ─── Virtual Environments ─────────────────────────────
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# ─── IDE / Editor ─────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Testing ──────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ─── Code Reviewer Runtime Data ──────────────────────
+.code-reviewer/vectordb/
+.code-reviewer/audit/
+.code-reviewer/logs/
+.code-reviewer/locks/
+.code-reviewer/benchmarks/baseline_*.json
+.code-reviewer/index_checkpoint.json
+
+# ─── Database ─────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── Docker ───────────────────────────────────────────
+.docker/
+
+# ─── Secrets (never commit) ──────────────────────────
+*.pem
+*.key
+secrets/
+
+# ─── Misc ─────────────────────────────────────────────
+*.log
+node_modules/
+.gemini/

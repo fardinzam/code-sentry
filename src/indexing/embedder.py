@@ -7,6 +7,7 @@ so they can be swapped without changing call sites.
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from typing import Protocol, runtime_checkable
 
 from src.utils.constants import DEFAULT_EMBEDDING_BATCH_SIZE
@@ -37,7 +38,11 @@ class EmbeddingClient(Protocol):
 # ─── Retry helper ─────────────────────────────────────────────────────────────
 
 
-def _with_retry(fn: "callable", max_retries: int = 3, base_delay: float = 1.0) -> "callable":
+def _with_retry(
+    fn: Callable[..., object],
+    max_retries: int = 3,
+    base_delay: float = 1.0,
+) -> Callable[..., object]:
     """Return a wrapper that retries fn on TransientError with exponential backoff."""
 
     def wrapper(*args: object, **kwargs: object) -> object:
@@ -79,7 +84,7 @@ class OpenAIEmbeddingClient:
         max_retries: int = 3,
     ) -> None:
         try:
-            from openai import OpenAI  # type: ignore[import-untyped]
+            from openai import OpenAI
         except ImportError as exc:
             raise ImportError("openai package required: pip install openai") from exc
 
@@ -110,8 +115,6 @@ class OpenAIEmbeddingClient:
         return all_vectors
 
     def _embed_one_batch(self, texts: list[str]) -> list[list[float]]:
-        import httpx
-
         for attempt in range(self._max_retries):
             try:
                 response = self._client.embeddings.create(model=self._model, input=texts)
@@ -121,10 +124,12 @@ class OpenAIEmbeddingClient:
                 if "429" in error_str or "rate" in error_str.lower():
                     if attempt < self._max_retries - 1:
                         delay = 2.0 ** attempt
-                        logger.warning("Rate limited — retrying", extra={"delay_s": delay})
+                        logger.warning("Rate limited - retrying", extra={"delay_s": delay})
                         time.sleep(delay)
                         continue
-                    raise TransientError(f"Rate limit not resolved after {self._max_retries} attempts") from exc
+                    raise TransientError(
+                        f"Rate limit not resolved after {self._max_retries} attempts"
+                    ) from exc
                 raise EmbeddingError(f"OpenAI embedding error: {exc}") from exc
         return []  # unreachable
 

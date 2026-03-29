@@ -39,8 +39,8 @@ def init(
 
     Creates the .code-reviewer/ directory and scaffolds config files.
     """
-    from pathlib import Path
     import shutil
+    from pathlib import Path
 
     repo = Path(repo_path).resolve()
     cr_dir = repo / ".code-reviewer"

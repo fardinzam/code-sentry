@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-import tempfile
 import warnings
 from pathlib import Path
 
@@ -38,11 +36,12 @@ class TestConfigHierarchy:
         # Other keys should still be defaults
         assert settings.llm.temperature == 0.2
 
-    def test_env_var_overrides_defaults(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_env_var_overrides_defaults(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         # pydantic-settings reads env vars at class instantiation time.
         # Test at the subsection level where env_prefix is applied.
         monkeypatch.setenv("CODE_REVIEWER_LLM_MODEL", "claude-3-opus")
-        from src.config.settings import LLMSettings
         settings = LLMSettings()
         assert settings.model == "claude-3-opus"
 
@@ -132,7 +131,7 @@ class TestScoringSettingsValidation:
             )
 
     def test_weight_out_of_range_raises_error(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             ScoringSettings(
                 weight_correctness=1.5,
                 weight_readability=0.0,

@@ -23,7 +23,8 @@ try:
     _TREE_SITTER_AVAILABLE = True
 except Exception:  # pragma: no cover
     _TREE_SITTER_AVAILABLE = False
-    logger.warning("tree-sitter not available — AST parsing disabled, using line-based fallback")
+    Node = None  # type: ignore[assignment,misc]
+    logger.warning("tree-sitter not available - AST parsing disabled, using line-based fallback")
 
 
 @dataclass
@@ -50,66 +51,85 @@ class CodeSymbol:
     imports: list[str] = field(default_factory=list)
 
 
-def _extract_docstring(node: "Node", source_bytes: bytes) -> str:
+# ParseError is re-exported so chunker.py can import it from here.
+__all__ = ["CodeSymbol", "ParseError", "parse_python_file"]
+
+
+def _extract_docstring(node: object, source_bytes: bytes) -> str:
     """Extract the first string literal from a function/class body."""
-    for child in node.children:
+    for child in getattr(node, "children", []):
         if child.type == "block":
             for stmt in child.children:
                 if stmt.type == "expression_statement":
                     for expr in stmt.children:
                         if expr.type == "string":
-                            return source_bytes[expr.start_byte : expr.end_byte].decode(
-                                "utf-8", errors="replace"
-                            ).strip("\"' \n")
+                            raw: bytes | None = source_bytes[
+                                expr.start_byte : expr.end_byte
+                            ]
+                            if raw is not None:
+                                return raw.decode("utf-8", errors="replace").strip("\"' \n")
     return ""
 
 
-def _node_source(node: "Node", source_bytes: bytes) -> str:
-    return source_bytes[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+def _node_source(node: object, source_bytes: bytes) -> str:
+    raw: bytes = source_bytes[
+        getattr(node, "start_byte", 0) : getattr(node, "end_byte", 0)
+    ]
+    return raw.decode("utf-8", errors="replace")
 
 
-def _extract_symbols(tree_root: "Node", source_bytes: bytes) -> list[CodeSymbol]:
+def _node_name(name_node: object | None) -> str:
+    """Safely decode a name node's text bytes."""
+    if name_node is None:
+        return "<anon>"
+    text: bytes | None = getattr(name_node, "text", None)
+    if text is None:
+        return "<anon>"
+    return text.decode("utf-8", errors="replace")
+
+
+def _extract_symbols(tree_root: object, source_bytes: bytes) -> list[CodeSymbol]:
     """Walk the AST and extract all top-level and class-level symbols."""
     symbols: list[CodeSymbol] = []
 
-    def walk(node: "Node", parent_class: str = "") -> None:
-        if node.type in ("function_definition", "async_function_definition"):
-            name_node = node.child_by_field_name("name")
-            name = name_node.text.decode() if name_node else "<anon>"
+    def walk(node: object, parent_class: str = "") -> None:
+        node_type: str = getattr(node, "type", "")
+        if node_type in ("function_definition", "async_function_definition"):
+            name_node = getattr(node, "child_by_field_name", lambda _: None)("name")
+            name = _node_name(name_node)
             qualified = f"{parent_class}.{name}" if parent_class else name
             symbols.append(
                 CodeSymbol(
                     name=qualified,
                     symbol_type="method" if parent_class else "function",
-                    start_line=node.start_point[0] + 1,
-                    end_line=node.end_point[0] + 1,
+                    start_line=getattr(node, "start_point", (0,))[0] + 1,
+                    end_line=getattr(node, "end_point", (0,))[0] + 1,
                     docstring=_extract_docstring(node, source_bytes),
                     source=_node_source(node, source_bytes),
                     parent_class=parent_class,
                 )
             )
-            # Don't recurse into nested functions as separate symbols
 
-        elif node.type == "class_definition":
-            name_node = node.child_by_field_name("name")
-            class_name = name_node.text.decode() if name_node else "<anon>"
-            body = node.child_by_field_name("body")
+        elif node_type == "class_definition":
+            name_node = getattr(node, "child_by_field_name", lambda _: None)("name")
+            class_name = _node_name(name_node)
+            body = getattr(node, "child_by_field_name", lambda _: None)("body")
             symbols.append(
                 CodeSymbol(
                     name=class_name,
                     symbol_type="class",
-                    start_line=node.start_point[0] + 1,
-                    end_line=node.end_point[0] + 1,
+                    start_line=getattr(node, "start_point", (0,))[0] + 1,
+                    end_line=getattr(node, "end_point", (0,))[0] + 1,
                     docstring=_extract_docstring(node, source_bytes),
                     source=_node_source(node, source_bytes),
                 )
             )
             if body:
-                for child in body.children:
+                for child in getattr(body, "children", []):
                     walk(child, parent_class=class_name)
 
         else:
-            for child in node.children:
+            for child in getattr(node, "children", []):
                 walk(child, parent_class=parent_class)
 
     walk(tree_root)
@@ -141,7 +161,7 @@ def parse_python_file(path: Path) -> list[CodeSymbol]:
         tree = _PARSER.parse(source_bytes)
         if tree.root_node.has_error:
             logger.warning(
-                "AST parse contains errors — partial results may be returned",
+                "AST parse contains errors - partial results may be returned",
                 extra={"file": str(path)},
             )
         return _extract_symbols(tree.root_node, source_bytes)

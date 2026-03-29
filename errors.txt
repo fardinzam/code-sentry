@@ -1,0 +1,1804 @@
+***Lint:***
+
+Run ruff check .
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/cli/config.py:21:5
+
+   |
+
+19 | ) -> None:
+
+20 |     """Print the resolved configuration (sensitive values masked)."""
+
+21 |     from src.config.settings import get_settings, SENSITIVE_KEY_FRAGMENTS
+
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+22 |
+
+23 |     with warnings.catch_warnings():
+
+   |
+
+help: Organize imports
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/cli/config.py:77:5
+
+   |
+
+75 |   ) -> None:
+
+76 |       """Validate the configuration for errors."""
+
+77 | /     import warnings
+
+78 | |     from pydantic import ValidationError
+
+   | |________________________________________^
+
+79 |
+
+80 |       try:
+
+   |
+
+help: Organize imports
+
+
+
+F401 [*] `pydantic.ValidationError` imported but unused
+
+  --> src/cli/config.py:78:26
+
+   |
+
+76 |     """Validate the configuration for errors."""
+
+77 |     import warnings
+
+78 |     from pydantic import ValidationError
+
+   |                          ^^^^^^^^^^^^^^^
+
+79 |
+
+80 |     try:
+
+   |
+
+help: Remove unused import: `pydantic.ValidationError`
+
+
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+  --> src/cli/config.py:95:9
+
+   |
+
+93 |     except Exception as exc:
+
+94 |         console.print(f"[red]✗ Configuration error:[/] {exc}")
+
+95 |         raise typer.Exit(1)
+
+   |         ^^^^^^^^^^^^^^^^^^^
+
+   |
+
+
+
+F541 [*] f-string without any placeholders
+
+  --> src/cli/index.py:42:19
+
+   |
+
+41 |     data = json.loads(checkpoint.read_text())
+
+42 |     console.print(f"[bold]Indexing Status[/] (in progress / last checkpoint)")
+
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+43 |     console.print(f"  Files indexed: [cyan]{len(data.get('completed_files', []))}[/]")
+
+44 |     console.print(f"  Total chunks:  [cyan]{data.get('total_chunks', 0)}[/]")
+
+   |
+
+help: Remove extraneous `f` prefix
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/cli/index.py:49:5
+
+   |
+
+47 |   def _run_index(repo_path: str, resume: bool) -> None:
+
+48 |       """Execute the indexing pipeline."""
+
+49 | /     import os
+
+50 | |     from src.config.settings import get_settings
+
+51 | |     from src.indexing.embedder import make_embedding_client
+
+52 | |     from src.indexing.vectordb import ChromaDBClient
+
+53 | |     from src.indexing.pipeline import IndexingPipeline
+
+54 | |     from src.utils.logging import configure_logging
+
+   | |___________________________________________________^
+
+55 |
+
+56 |       repo = Path(repo_path).resolve()
+
+   |
+
+help: Organize imports
+
+
+
+F401 [*] `os` imported but unused
+
+  --> src/cli/index.py:49:12
+
+   |
+
+47 | def _run_index(repo_path: str, resume: bool) -> None:
+
+48 |     """Execute the indexing pipeline."""
+
+49 |     import os
+
+   |            ^^
+
+50 |     from src.config.settings import get_settings
+
+51 |     from src.indexing.embedder import make_embedding_client
+
+   |
+
+help: Remove unused import: `os`
+
+
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+
+  --> src/cli/index.py:98:9
+
+   |
+
+96 |     except Exception as exc:
+
+97 |         console.print(f"[red]✗ Indexing failed:[/] {exc}")
+
+98 |         raise typer.Exit(1)
+
+   |         ^^^^^^^^^^^^^^^^^^^
+
+   |
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/cli/main.py:42:5
+
+   |
+
+40 |       Creates the .code-reviewer/ directory and scaffolds config files.
+
+41 |       """
+
+42 | /     from pathlib import Path
+
+43 | |     import shutil
+
+   | |_________________^
+
+44 |
+
+45 |       repo = Path(repo_path).resolve()
+
+   |
+
+help: Organize imports
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/config/settings.py:14:1
+
+   |
+
+12 |   """
+
+13 |
+
+14 | / from __future__ import annotations
+
+15 | |
+
+16 | | import logging
+
+17 | | import os
+
+   | |_________^
+
+18 |   try:
+
+19 |       import tomllib
+
+   |
+
+help: Organize imports
+
+
+
+F401 [*] `os` imported but unused
+
+  --> src/config/settings.py:17:8
+
+   |
+
+16 | import logging
+
+17 | import os
+
+   |        ^^
+
+18 | try:
+
+19 |     import tomllib
+
+   |
+
+help: Remove unused import: `os`
+
+
+
+E501 Line too long (102 > 100)
+
+  --> src/config/settings.py:83:101
+
+   |
+
+81 |     context_lines: int = 3
+
+82 |     include_extensions: list[str] = Field(
+
+83 |         default=[".py", ".js", ".ts", ".java", ".go", ".rs", ".md", ".txt", ".yaml", ".toml", ".json"]
+
+   |                                                                                                     ^^
+
+84 |     )
+
+   |
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+   --> src/config/settings.py:133:43
+
+    |
+
+132 |     @model_validator(mode="after")
+
+133 |     def _weights_must_sum_to_one(self) -> "ScoringSettings":
+
+    |                                           ^^^^^^^^^^^^^^^^^
+
+134 |         total = (
+
+135 |             self.weight_correctness
+
+    |
+
+help: Remove quotes
+
+
+
+F841 Local variable `result` is assigned to but never used
+
+   --> src/git_ops/client.py:211:9
+
+    |
+
+209 |             Tuple of (success: bool, error_message: str).
+
+210 |         """
+
+211 |         result = _run(
+
+    |         ^^^^^^
+
+212 |             ["apply", "--check", "--3way"],
+
+213 |             cwd=self._repo,
+
+    |
+
+help: Remove assignment to unused variable `result`
+
+
+
+F401 [*] `pathlib.Path` imported but unused
+
+  --> src/git_ops/sandbox.py:11:21
+
+   |
+
+10 | import time
+
+11 | from pathlib import Path
+
+   |                     ^^^^
+
+12 |
+
+13 | from src.git_ops.client import GitClient, make_sandbox_branch_name
+
+   |
+
+help: Remove unused import: `pathlib.Path`
+
+
+
+UP035 [*] Import from `collections.abc` instead: `Iterator`
+
+  --> src/indexing/chunker.py:21:1
+
+   |
+
+19 | from dataclasses import dataclass, field
+
+20 | from pathlib import Path
+
+21 | from typing import Iterator
+
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+22 |
+
+23 | from src.indexing.parser import CodeSymbol, ParseError, parse_python_file
+
+   |
+
+help: Import from `collections.abc`
+
+
+
+F401 [*] `typing.Iterator` imported but unused
+
+  --> src/indexing/chunker.py:21:20
+
+   |
+
+19 | from dataclasses import dataclass, field
+
+20 | from pathlib import Path
+
+21 | from typing import Iterator
+
+   |                    ^^^^^^^^
+
+22 |
+
+23 | from src.indexing.parser import CodeSymbol, ParseError, parse_python_file
+
+   |
+
+help: Remove unused import: `typing.Iterator`
+
+
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+
+   --> src/indexing/chunker.py:182:9
+
+    |
+
+181 |           # Classes: whole class if small, else split into method chunks
+
+182 | /         elif symbol.symbol_type == "class":
+
+183 | |             if tokens <= MAX_CHUNK_TOKENS:
+
+    | |__________________________________________^
+
+184 |                   chunks.append(_symbol_to_chunk(symbol, file_path, language, idx, lines))
+
+185 |                   idx += 1
+
+    |
+
+help: Combine `if` statements using `and`
+
+
+
+E501 Line too long (103 > 100)
+
+   --> src/indexing/chunker.py:209:101
+
+    |
+
+207 |         if not text_part.strip():
+
+208 |             continue
+
+209 |         before, after = _get_context_lines(lines, start, min(start + target_lines - 1, len(lines) - 1))
+
+    |                                                                                                     ^^^
+
+210 |         chunks.append(
+
+211 |             Chunk(
+
+    |
+
+
+
+B905 `zip()` without an explicit `strict=` parameter
+
+   --> src/indexing/chunker.py:237:43
+
+    |
+
+235 |     line_cursor = 1
+
+236 |
+
+237 |     for idx, (heading, body) in enumerate(zip([""] + headings, splits if not headings else [""] + splits)):
+
+    |                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+238 |         combined = (heading + "\n" + body).strip()
+
+239 |         if not combined:
+
+    |
+
+help: Add explicit value for parameter `strict=`
+
+
+
+RUF005 Consider `["", *headings]` instead of concatenation
+
+   --> src/indexing/chunker.py:237:47
+
+    |
+
+235 |     line_cursor = 1
+
+236 |
+
+237 |     for idx, (heading, body) in enumerate(zip([""] + headings, splits if not headings else [""] + splits)):
+
+    |                                               ^^^^^^^^^^^^^^^
+
+238 |         combined = (heading + "\n" + body).strip()
+
+239 |         if not combined:
+
+    |
+
+help: Replace with `["", *headings]`
+
+
+
+RUF005 Consider `["", *splits]` instead of concatenation
+
+   --> src/indexing/chunker.py:237:92
+
+    |
+
+235 |     line_cursor = 1
+
+236 |
+
+237 |     for idx, (heading, body) in enumerate(zip([""] + headings, splits if not headings else [""] + splits)):
+
+    |                                                                                            ^^^^^^^^^^^^^
+
+238 |         combined = (heading + "\n" + body).strip()
+
+239 |         if not combined:
+
+    |
+
+help: Replace with `["", *splits]`
+
+
+
+E501 Line too long (107 > 100)
+
+   --> src/indexing/chunker.py:237:101
+
+    |
+
+235 |     line_cursor = 1
+
+236 |
+
+237 |     for idx, (heading, body) in enumerate(zip([""] + headings, splits if not headings else [""] + splits)):
+
+    |                                                                                                     ^^^^^^^
+
+238 |         combined = (heading + "\n" + body).strip()
+
+239 |         if not combined:
+
+    |
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/embedder.py:40:21
+
+   |
+
+40 | def _with_retry(fn: "callable", max_retries: int = 3, base_delay: float = 1.0) -> "callable":
+
+   |                     ^^^^^^^^^^
+
+41 |     """Return a wrapper that retries fn on TransientError with exponential backoff."""
+
+   |
+
+help: Remove quotes
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/embedder.py:40:83
+
+   |
+
+40 | def _with_retry(fn: "callable", max_retries: int = 3, base_delay: float = 1.0) -> "callable":
+
+   |                                                                                   ^^^^^^^^^^
+
+41 |     """Return a wrapper that retries fn on TransientError with exponential backoff."""
+
+   |
+
+help: Remove quotes
+
+
+
+F401 [*] `httpx` imported but unused
+
+   --> src/indexing/embedder.py:113:16
+
+    |
+
+112 |     def _embed_one_batch(self, texts: list[str]) -> list[list[float]]:
+
+113 |         import httpx
+
+    |                ^^^^^
+
+114 |
+
+115 |         for attempt in range(self._max_retries):
+
+    |
+
+help: Remove unused import: `httpx`
+
+
+
+E501 Line too long (112 > 100)
+
+   --> src/indexing/embedder.py:127:101
+
+    |
+
+125 |                         time.sleep(delay)
+
+126 |                         continue
+
+127 |                     raise TransientError(f"Rate limit not resolved after {self._max_retries} attempts") from exc
+
+    |                                                                                                     ^^^^^^^^^^^^
+
+128 |                 raise EmbeddingError(f"OpenAI embedding error: {exc}") from exc
+
+129 |         return []  # unreachable
+
+    |
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/parser.py:53:30
+
+   |
+
+53 | def _extract_docstring(node: "Node", source_bytes: bytes) -> str:
+
+   |                              ^^^^^^
+
+54 |     """Extract the first string literal from a function/class body."""
+
+55 |     for child in node.children:
+
+   |
+
+help: Remove quotes
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/parser.py:67:24
+
+   |
+
+67 | def _node_source(node: "Node", source_bytes: bytes) -> str:
+
+   |                        ^^^^^^
+
+68 |     return source_bytes[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+
+   |
+
+help: Remove quotes
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/parser.py:71:33
+
+   |
+
+71 | def _extract_symbols(tree_root: "Node", source_bytes: bytes) -> list[CodeSymbol]:
+
+   |                                 ^^^^^^
+
+72 |     """Walk the AST and extract all top-level and class-level symbols."""
+
+73 |     symbols: list[CodeSymbol] = []
+
+   |
+
+help: Remove quotes
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+  --> src/indexing/parser.py:75:20
+
+   |
+
+73 |     symbols: list[CodeSymbol] = []
+
+74 |
+
+75 |     def walk(node: "Node", parent_class: str = "") -> None:
+
+   |                    ^^^^^^
+
+76 |         if node.type in ("function_definition", "async_function_definition"):
+
+77 |             name_node = node.child_by_field_name("name")
+
+   |
+
+help: Remove quotes
+
+
+
+UP035 [*] Import from `collections.abc` instead: `Generator`
+
+  --> src/indexing/pipeline.py:14:1
+
+   |
+
+12 | import time
+
+13 | from pathlib import Path
+
+14 | from typing import Generator
+
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+15 |
+
+16 | from src.config.settings import IndexingSettings
+
+   |
+
+help: Import from `collections.abc`
+
+
+
+F401 [*] `src.indexing.chunker.Chunk` imported but unused
+
+  --> src/indexing/pipeline.py:17:34
+
+   |
+
+16 | from src.config.settings import IndexingSettings
+
+17 | from src.indexing.chunker import Chunk, chunk_file
+
+   |                                  ^^^^^
+
+18 | from src.indexing.embedder import EmbeddingClient
+
+19 | from src.indexing.vectordb import VectorDBClient
+
+   |
+
+help: Remove unused import: `src.indexing.chunker.Chunk`
+
+
+
+F401 [*] `src.utils.constants.MAX_FILE_TOKENS` imported but unused
+
+  --> src/indexing/pipeline.py:23:5
+
+   |
+
+21 |     MAX_FILE_COUNT_HARD,
+
+22 |     MAX_FILE_COUNT_WARN,
+
+23 |     MAX_FILE_TOKENS,
+
+   |     ^^^^^^^^^^^^^^^
+
+24 | )
+
+25 | from src.utils.errors import IndexingError, RepositoryTooLargeError
+
+   |
+
+help: Remove unused import: `src.utils.constants.MAX_FILE_TOKENS`
+
+
+
+F401 [*] `src.utils.errors.IndexingError` imported but unused
+
+  --> src/indexing/pipeline.py:25:30
+
+   |
+
+23 |     MAX_FILE_TOKENS,
+
+24 | )
+
+25 | from src.utils.errors import IndexingError, RepositoryTooLargeError
+
+   |                              ^^^^^^^^^^^^^
+
+26 | from src.utils.logging import get_logger
+
+   |
+
+help: Remove unused import: `src.utils.errors.IndexingError`
+
+
+
+F841 Local variable `resolved` is assigned to but never used
+
+  --> src/indexing/pipeline.py:95:17
+
+   |
+
+93 |             # Resolve symlinks for depth check
+
+94 |             try:
+
+95 |                 resolved = file_path.resolve()
+
+   |                 ^^^^^^^^
+
+96 |             except OSError:
+
+97 |                 continue
+
+   |
+
+help: Remove assignment to unused variable `resolved`
+
+
+
+F401 [*] `dataclasses.asdict` imported but unused
+
+  --> src/indexing/vectordb.py:9:25
+
+   |
+
+ 7 | from __future__ import annotations
+
+ 8 |
+
+ 9 | from dataclasses import asdict
+
+   |                         ^^^^^^
+
+10 | from pathlib import Path
+
+11 | from typing import Any, Protocol, runtime_checkable
+
+   |
+
+help: Remove unused import: `dataclasses.asdict`
+
+
+
+B905 `zip()` without an explicit `strict=` parameter
+
+   --> src/indexing/vectordb.py:162:41
+
+    |
+
+160 |               return results
+
+161 |
+
+162 |           for doc_id, text, meta, dist in zip(
+
+    |  _________________________________________^
+
+163 | |             result["ids"][0],
+
+164 | |             result["documents"][0],
+
+165 | |             result["metadatas"][0],
+
+166 | |             result["distances"][0],
+
+167 | |         ):
+
+    | |_________^
+
+168 |               results.append({"id": doc_id, "text": text, "metadata": meta, "distance": dist})
+
+    |
+
+help: Add explicit value for parameter `strict=`
+
+
+
+F401 [*] `os` imported but unused
+
+ --> src/llm/client.py:7:8
+
+  |
+
+5 | import hashlib
+
+6 | import json
+
+7 | import os
+
+  |        ^^
+
+8 | import time
+
+9 | from dataclasses import dataclass
+
+  |
+
+help: Remove unused import: `os`
+
+
+
+F401 [*] `src.utils.constants.HIGH_TEMPERATURE_CACHE_BYPASS` imported but unused
+
+  --> src/llm/client.py:13:5
+
+   |
+
+12 | from src.utils.constants import (
+
+13 |     HIGH_TEMPERATURE_CACHE_BYPASS,
+
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+14 |     LLM_CACHE_TTL_HOURS,
+
+15 | )
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `src.utils.constants.LLM_CACHE_TTL_HOURS` imported but unused
+
+  --> src/llm/client.py:14:5
+
+   |
+
+12 | from src.utils.constants import (
+
+13 |     HIGH_TEMPERATURE_CACHE_BYPASS,
+
+14 |     LLM_CACHE_TTL_HOURS,
+
+   |     ^^^^^^^^^^^^^^^^^^^
+
+15 | )
+
+16 | from src.utils.errors import LLMAuthError, LLMBudgetExhaustedError, LLMError, TransientError
+
+   |
+
+help: Remove unused import
+
+
+
+RUF001 String contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+
+  --> src/retrieval/prompt_builder.py:49:43
+
+   |
+
+47 |         if r.symbol_name:
+
+48 |             header += f" — `{r.symbol_name}`"
+
+49 |         header += f" (lines {r.start_line}–{r.end_line}, score={r.score:.2f})"
+
+   |                                           ^
+
+50 |         parts.append(f"{header}\n```\n{r.text}\n```")
+
+51 |     return "\n\n".join(parts)
+
+   |
+
+
+
+E501 Line too long (106 > 100)
+
+  --> src/retrieval/prompt_builder.py:60:101
+
+   |
+
+58 |         dirnames[:] = sorted(
+
+59 |             d for d in dirnames
+
+60 |             if not d.startswith(".") and d not in {"__pycache__", "node_modules", ".venv", "venv", "dist"}
+
+   |                                                                                                     ^^^^^^
+
+61 |         )
+
+62 |         depth = Path(dirpath).relative_to(repo_root).parts
+
+   |
+
+
+
+RUF002 Docstring contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+
+  --> src/retrieval/search.py:25:44
+
+   |
+
+23 |         start_line: 1-indexed start line.
+
+24 |         end_line: 1-indexed end line.
+
+25 |         score: Combined relevance score 0.0–1.0 (higher = more relevant).
+
+   |                                            ^
+
+26 |         metadata: Full metadata dict from the vector store.
+
+27 |     """
+
+   |
+
+
+
+RUF003 Comment contains ambiguous `–` (EN DASH). Did you mean `-` (HYPHEN-MINUS)?
+
+  --> src/utils/constants.py:9:50
+
+   |
+
+ 7 | MIN_CHUNK_TOKENS: int = 30
+
+ 8 | MAX_CHUNK_TOKENS: int = 1500
+
+ 9 | TARGET_CHUNK_TOKENS: int = 650  # midpoint of 500–800 target range
+
+   |                                                  ^
+
+10 | CHUNK_CONTEXT_LINES: int = 3  # leading/trailing lines attached as metadata
+
+11 | MAX_FILE_TOKENS: int = 50_000
+
+   |
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> src/utils/logging.py:13:1
+
+   |
+
+11 |   """
+
+12 |
+
+13 | / from __future__ import annotations
+
+14 | |
+
+15 | | import json
+
+16 | | import logging
+
+17 | | import logging.handlers
+
+18 | | import time
+
+19 | | from pathlib import Path
+
+20 | | from typing import Any
+
+   | |______________________^
+
+   |
+
+help: Organize imports
+
+
+
+UP037 [*] Remove quotes from type annotation
+
+   --> src/utils/logging.py:154:28
+
+    |
+
+152 |         self._file.close()
+
+153 |
+
+154 |     def __enter__(self) -> "AuditLogger":
+
+    |                            ^^^^^^^^^^^^^
+
+155 |         return self
+
+    |
+
+help: Remove quotes
+
+
+
+I001 [*] Import block is un-sorted or un-formatted
+
+  --> tests/unit/test_chunker.py:3:1
+
+   |
+
+ 1 |   """Unit tests for the AST parser and code chunker (§1.5)."""
+
+ 2 |
+
+ 3 | / from __future__ import annotations
+
+ 4 | |
+
+ 5 | | from pathlib import Path
+
+ 6 | |
+
+ 7 | | import pytest
+
+ 8 | |
+
+ 9 | | from src.indexing.chunker import (
+
+10 | |     Chunk,
+
+11 | |     _estimate_tokens,
+
+12 | |     _markdown_chunks,
+
+13 | |     _paragraph_chunks,
+
+14 | |     _single_chunk,
+
+15 | |     chunk_file,
+
+16 | | )
+
+17 | | from src.utils.constants import MAX_CHUNK_TOKENS, MIN_CHUNK_TOKENS
+
+   | |__________________________________________________________________^
+
+   |
+
+help: Organize imports
+
+
+
+F401 [*] `pytest` imported but unused
+
+ --> tests/unit/test_chunker.py:7:8
+
+  |
+
+5 | from pathlib import Path
+
+6 |
+
+7 | import pytest
+
+  |        ^^^^^^
+
+8 |
+
+9 | from src.indexing.chunker import (
+
+  |
+
+help: Remove unused import: `pytest`
+
+
+
+F401 [*] `src.indexing.chunker.Chunk` imported but unused
+
+  --> tests/unit/test_chunker.py:10:5
+
+   |
+
+ 9 | from src.indexing.chunker import (
+
+10 |     Chunk,
+
+   |     ^^^^^
+
+11 |     _estimate_tokens,
+
+12 |     _markdown_chunks,
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `src.indexing.chunker._paragraph_chunks` imported but unused
+
+  --> tests/unit/test_chunker.py:13:5
+
+   |
+
+11 |     _estimate_tokens,
+
+12 |     _markdown_chunks,
+
+13 |     _paragraph_chunks,
+
+   |     ^^^^^^^^^^^^^^^^^
+
+14 |     _single_chunk,
+
+15 |     chunk_file,
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `src.indexing.chunker._single_chunk` imported but unused
+
+  --> tests/unit/test_chunker.py:14:5
+
+   |
+
+12 |     _markdown_chunks,
+
+13 |     _paragraph_chunks,
+
+14 |     _single_chunk,
+
+   |     ^^^^^^^^^^^^^
+
+15 |     chunk_file,
+
+16 | )
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `src.utils.constants.MAX_CHUNK_TOKENS` imported but unused
+
+  --> tests/unit/test_chunker.py:17:33
+
+   |
+
+15 |     chunk_file,
+
+16 | )
+
+17 | from src.utils.constants import MAX_CHUNK_TOKENS, MIN_CHUNK_TOKENS
+
+   |                                 ^^^^^^^^^^^^^^^^
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `src.utils.constants.MIN_CHUNK_TOKENS` imported but unused
+
+  --> tests/unit/test_chunker.py:17:51
+
+   |
+
+15 |     chunk_file,
+
+16 | )
+
+17 | from src.utils.constants import MAX_CHUNK_TOKENS, MIN_CHUNK_TOKENS
+
+   |                                                   ^^^^^^^^^^^^^^^^
+
+   |
+
+help: Remove unused import
+
+
+
+F401 [*] `os` imported but unused
+
+ --> tests/unit/test_config_settings.py:5:8
+
+  |
+
+3 | from __future__ import annotations
+
+4 |
+
+5 | import os
+
+  |        ^^
+
+6 | import tempfile
+
+7 | import warnings
+
+  |
+
+help: Remove unused import: `os`
+
+
+
+F401 [*] `tempfile` imported but unused
+
+ --> tests/unit/test_config_settings.py:6:8
+
+  |
+
+5 | import os
+
+6 | import tempfile
+
+  |        ^^^^^^^^
+
+7 | import warnings
+
+8 | from pathlib import Path
+
+  |
+
+help: Remove unused import: `tempfile`
+
+
+
+F401 [*] `src.config.settings.LLMSettings` imported but unused
+
+  --> tests/unit/test_config_settings.py:13:5
+
+   |
+
+12 | from src.config.settings import (
+
+13 |     LLMSettings,
+
+   |     ^^^^^^^^^^^
+
+14 |     ScoringSettings,
+
+15 |     _load_toml_file,
+
+   |
+
+help: Remove unused import: `src.config.settings.LLMSettings`
+
+
+
+E501 Line too long (103 > 100)
+
+  --> tests/unit/test_config_settings.py:41:101
+
+   |
+
+39 |         assert settings.llm.temperature == 0.2
+
+40 |
+
+41 |     def test_env_var_overrides_defaults(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+
+   |                                                                                                     ^^^
+
+42 |         # pydantic-settings reads env vars at class instantiation time.
+
+43 |         # Test at the subsection level where env_prefix is applied.
+
+   |
+
+
+
+F811 [*] Redefinition of unused `LLMSettings` from line 13
+
+  --> tests/unit/test_config_settings.py:45:41
+
+   |
+
+43 |         # Test at the subsection level where env_prefix is applied.
+
+44 |         monkeypatch.setenv("CODE_REVIEWER_LLM_MODEL", "claude-3-opus")
+
+45 |         from src.config.settings import LLMSettings
+
+   |                                         ^^^^^^^^^^^ `LLMSettings` redefined here
+
+46 |         settings = LLMSettings()
+
+47 |         assert settings.model == "claude-3-opus"
+
+   |
+
+  ::: tests/unit/test_config_settings.py:13:5
+
+   |
+
+12 | from src.config.settings import (
+
+13 |     LLMSettings,
+
+   |     ----------- previous definition of `LLMSettings` here
+
+14 |     ScoringSettings,
+
+15 |     _load_toml_file,
+
+   |
+
+help: Remove definition: `LLMSettings`
+
+
+
+B017 Do not assert blind exception: `Exception`
+
+   --> tests/unit/test_config_settings.py:135:14
+
+    |
+
+134 |     def test_weight_out_of_range_raises_error(self) -> None:
+
+135 |         with pytest.raises(Exception):
+
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^
+
+136 |             ScoringSettings(
+
+137 |                 weight_correctness=1.5,
+
+    |
+
+
+
+E501 Line too long (103 > 100)
+
+  --> tests/unit/test_git_ops.py:56:101
+
+   |
+
+54 |         subprocess.run(["git", "init", "-b", "main"], cwd=repo, check=True, capture_output=True)
+
+55 |         subprocess.run(
+
+56 |             ["git", "config", "user.email", "test@test.com"], cwd=repo, check=True, capture_output=True
+
+   |                                                                                                     ^^^
+
+57 |         )
+
+58 |         subprocess.run(
+
+   |
+
+
+
+F401 [*] `src.llm.client.LLMResponse` imported but unused
+
+  --> tests/unit/test_llm_client.py:11:5
+
+   |
+
+10 | from src.llm.client import (
+
+11 |     LLMResponse,
+
+   |     ^^^^^^^^^^^
+
+12 |     OpenAIClient,
+
+13 |     TokenBudgetTracker,
+
+   |
+
+help: Remove unused import: `src.llm.client.LLMResponse`
+
+
+
+SIM105 Use `contextlib.suppress(LLMBudgetExhaustedError)` instead of `try`-`except`-`pass`
+
+  --> tests/unit/test_llm_client.py:42:9
+
+   |
+
+40 |       def test_remaining_never_goes_negative(self) -> None:
+
+41 |           tracker = TokenBudgetTracker(max_tokens=100)
+
+42 | /         try:
+
+43 | |             tracker.record(200)
+
+44 | |         except LLMBudgetExhaustedError:
+
+45 | |             pass
+
+   | |________________^
+
+46 |           assert tracker.remaining == 0
+
+   |
+
+help: Replace `try`-`except`-`pass` with `with contextlib.suppress(LLMBudgetExhaustedError): ...`
+
+
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+
+  --> tests/unit/test_llm_client.py:93:9
+
+   |
+
+91 |               raise Exception("401 Unauthorized: invalid_api_key")
+
+92 |
+
+93 | /         with patch.object(client._client.chat.completions, "create", side_effect=fake_create):
+
+94 | |             with pytest.raises(LLMAuthError):
+
+   | |_____________________________________________^
+
+95 |                   client.generate([{"role": "user", "content": "hi"}])
+
+   |
+
+help: Combine `with` statements
+
+
+
+SIM117 [*] Use a single `with` statement with multiple contexts instead of nested `with` statements
+
+   --> tests/unit/test_llm_client.py:127:9
+
+    |
+
+125 |           monkeypatch.setattr(time, "sleep", lambda _: None)
+
+126 |
+
+127 | /         with patch.object(
+
+128 | |             client._client.chat.completions,
+
+129 | |             "create",
+
+130 | |             side_effect=Exception("429 rate limit"),
+
+131 | |         ):
+
+132 | |             with pytest.raises(TransientError):
+
+    | |_______________________________________________^
+
+133 |                   client.generate([{"role": "user", "content": "hi"}])
+
+    |
+
+help: Combine `with` statements
+
+
+
+F401 [*] `pytest` imported but unused
+
+  --> tests/unit/test_logging.py:9:8
+
+   |
+
+ 7 | from pathlib import Path
+
+ 8 |
+
+ 9 | import pytest
+
+   |        ^^^^^^
+
+10 |
+
+11 | from src.utils.logging import AuditLogger, configure_logging, get_logger
+
+   |
+
+help: Remove unused import: `pytest`
+
+
+
+Found 66 errors.
+
+[*] 44 fixable with the `--fix` option (8 hidden fixes can be enabled with the `--unsafe-fixes` option).
+
+Error: Process completed with exit code 1.
+
+
+
+
+
+
+***Type Check***
+
+
+Run mypy src/
+
+src/indexing/parser.py:78: error: Item "None" of "bytes | None" has no attribute "decode"  [union-attr]
+
+src/indexing/parser.py:95: error: Item "None" of "bytes | None" has no attribute "decode"  [union-attr]
+
+src/indexing/chunker.py:23: error: Module "src.indexing.parser" does not explicitly export attribute "ParseError"  [attr-defined]
+
+src/config/settings.py:21: error: Cannot find implementation or library stub for module named "tomli"  [import-not-found]
+
+src/config/settings.py:21: note: Error code "import-not-found" not covered by "type: ignore" comment
+
+src/config/settings.py:21: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+
+src/cli/config.py:21: error: Module "src.config.settings" does not explicitly export attribute "SENSITIVE_KEY_FRAGMENTS"  [attr-defined]
+
+src/llm/client.py:89: error: Unused "type: ignore" comment  [unused-ignore]
+
+src/indexing/embedder.py:40: error: Function "builtins.callable" is not valid as a type  [valid-type]
+
+src/indexing/embedder.py:40: note: Perhaps you meant "typing.Callable" instead of "callable"?
+
+src/indexing/embedder.py:46: error: callable? not callable  [misc]
+
+src/indexing/embedder.py:82: error: Unused "type: ignore" comment  [unused-ignore]
+
+src/indexing/vectordb.py:66: error: Unused "type: ignore" comment  [unused-ignore]
+
+src/indexing/vectordb.py:122: error: Argument "embeddings" to "upsert" of "Collection" has incompatible type "list[list[float]]"; expected "ndarray[tuple[Any, ...], dtype[signedinteger[_32Bit] | floating[_32Bit]]] | list[ndarray[tuple[Any, ...], dtype[signedinteger[_32Bit] | floating[_32Bit]]]] | Sequence[float] | Sequence[int] | list[Sequence[float] | Sequence[int]] | None"  [arg-type]
+
+src/indexing/vectordb.py:124: error: Argument "metadatas" to "upsert" of "Collection" has incompatible type "list[dict[str, object]]"; expected "Mapping[str, str | int | float | bool | SparseVector | list[str | int | float | bool] | None] | list[Mapping[str, str | int | float | bool | SparseVector | list[str | int | float | bool] | None]] | None"  [arg-type]
+
+src/indexing/vectordb.py:164: error: Value of type "list[list[str]] | None" is not indexable  [index]
+
+src/indexing/vectordb.py:165: error: Value of type "list[list[Mapping[str, str | int | float | bool | SparseVector | list[str | int | float | bool] | None]]] | None" is not indexable  [index]
+
+src/indexing/vectordb.py:166: error: Value of type "list[list[float]] | None" is not indexable  [index]
+
+src/indexing/pipeline.py:133: error: Returning Any from function declared to return "dict[str, object]"  [no-any-return]
+
+src/indexing/pipeline.py:139: error: Unsupported right operand type for in ("object")  [operator]
+
+src/indexing/pipeline.py:144: error: No overload variant of "int" matches argument type "object"  [call-overload]
+
+src/indexing/pipeline.py:144: note: Possible overload variants:
+
+src/indexing/pipeline.py:144: note:     def __new__(cls, str | Buffer | SupportsInt | SupportsIndex | SupportsTrunc = ..., /) -> int
+
+src/indexing/pipeline.py:144: note:     def __new__(cls, str | bytes | bytearray, /, base: SupportsIndex) -> int
+
+Found 18 errors in 8 files (checked 34 source files)
+
+Error: Process completed with exit code 1.
+
+
+
+***Unit Tests***
+
+
+Run pytest tests/unit/ --cov=src --cov-report=xml
+
+
+============================= test session starts ==============================
+
+platform linux -- Python 3.11.15, pytest-9.0.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.15/x64/bin/python
+
+cachedir: .pytest_cache
+
+rootdir: /home/runner/work/code-sentry/code-sentry
+
+configfile: pyproject.toml
+
+plugins: cov-7.1.0, mock-3.15.1, anyio-4.13.0, asyncio-1.3.0
+
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+
+collecting ... collected 54 items
+
+
+
+tests/unit/test_chunker.py::TestChunkFile::test_python_functions_produce_separate_chunks PASSED [  1%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_each_chunk_has_correct_file_path PASSED [  3%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_empty_file_returns_no_chunks PASSED [  5%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_markdown_file_split_at_headings PASSED [  7%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_toml_file_single_chunk PASSED [  9%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_large_file_triggers_line_fallback PASSED [ 11%]
+
+tests/unit/test_chunker.py::TestChunkFile::test_chunk_indices_are_sequential PASSED [ 12%]
+
+tests/unit/test_chunker.py::TestMarkdownChunker::test_splits_at_h2_headings PASSED [ 14%]
+
+tests/unit/test_chunker.py::TestMarkdownChunker::test_chunk_method_is_heading PASSED [ 16%]
+
+tests/unit/test_chunker.py::TestMarkdownChunker::test_empty_markdown_falls_back_to_paragraphs PASSED [ 18%]
+
+tests/unit/test_chunker.py::TestTokenEstimation::test_non_empty_string_has_positive_tokens PASSED [ 20%]
+
+tests/unit/test_chunker.py::TestTokenEstimation::test_empty_string_returns_one PASSED [ 22%]
+
+tests/unit/test_chunker.py::TestTokenEstimation::test_longer_text_has_more_tokens PASSED [ 24%]
+
+tests/unit/test_config_settings.py::TestConfigHierarchy::test_defaults_are_applied_without_config_files PASSED [ 25%]
+
+tests/unit/test_config_settings.py::TestConfigHierarchy::test_project_config_overrides_defaults PASSED [ 27%]
+
+tests/unit/test_config_settings.py::TestConfigHierarchy::test_env_var_overrides_defaults PASSED [ 29%]
+
+tests/unit/test_config_settings.py::TestConfigHierarchy::test_deep_merge_preserves_other_sections PASSED [ 31%]
+
+tests/unit/test_config_settings.py::TestSensitiveValueDetection::test_api_key_in_config_file_is_ignored PASSED [ 33%]
+
+tests/unit/test_config_settings.py::TestSensitiveValueDetection::test_non_sensitive_keys_are_not_stripped PASSED [ 35%]
+
+tests/unit/test_config_settings.py::TestSensitiveValueDetection::test_all_sensitive_fragments_are_caught PASSED [ 37%]
+
+tests/unit/test_config_settings.py::TestConfigMerge::test_later_overrides_earlier PASSED [ 38%]
+
+tests/unit/test_config_settings.py::TestConfigMerge::test_merge_does_not_mutate_inputs PASSED [ 40%]
+
+tests/unit/test_config_settings.py::TestScoringSettingsValidation::test_weights_summing_to_one_are_valid PASSED [ 42%]
+
+tests/unit/test_config_settings.py::TestScoringSettingsValidation::test_weights_not_summing_to_one_raise_error PASSED [ 44%]
+
+tests/unit/test_config_settings.py::TestScoringSettingsValidation::test_weight_out_of_range_raises_error PASSED [ 46%]
+
+tests/unit/test_git_ops.py::TestURLSanitization::test_https_url_with_token_is_sanitized PASSED [ 48%]
+
+tests/unit/test_git_ops.py::TestURLSanitization::test_plain_https_url_is_unchanged PASSED [ 50%]
+
+tests/unit/test_git_ops.py::TestURLSanitization::test_ssh_url_is_unchanged PASSED [ 51%]
+
+tests/unit/test_git_ops.py::TestSandboxBranchNaming::test_branch_has_correct_prefix PASSED [ 53%]
+
+tests/unit/test_git_ops.py::TestSandboxBranchNaming::test_branch_names_are_unique PASSED [ 55%]
+
+tests/unit/test_git_ops.py::TestGitClientWithRealRepo::test_get_current_sha_returns_hex PASSED [ 57%]
+
+tests/unit/test_git_ops.py::TestGitClientWithRealRepo::test_is_dirty_false_on_clean_repo PASSED [ 59%]
+
+tests/unit/test_git_ops.py::TestGitClientWithRealRepo::test_is_dirty_true_after_modification PASSED [ 61%]
+
+tests/unit/test_git_ops.py::TestGitClientWithRealRepo::test_create_and_delete_branch PASSED [ 62%]
+
+tests/unit/test_git_ops.py::TestGitClientWithRealRepo::test_commit_log_returns_entries PASSED [ 64%]
+
+tests/unit/test_git_ops.py::TestSandboxManager::test_create_raises_if_repo_is_dirty PASSED [ 66%]
+
+tests/unit/test_llm_client.py::TestTokenBudgetTracker::test_recording_within_budget_does_not_raise PASSED [ 68%]
+
+tests/unit/test_llm_client.py::TestTokenBudgetTracker::test_exceeding_budget_raises_error PASSED [ 70%]
+
+tests/unit/test_llm_client.py::TestTokenBudgetTracker::test_warning_logged_at_80_percent PASSED [ 72%]
+
+tests/unit/test_llm_client.py::TestTokenBudgetTracker::test_remaining_never_goes_negative PASSED [ 74%]
+
+tests/unit/test_llm_client.py::TestCacheKey::test_same_inputs_produce_same_key PASSED [ 75%]
+
+tests/unit/test_llm_client.py::TestCacheKey::test_different_model_produces_different_key PASSED [ 77%]
+
+tests/unit/test_llm_client.py::TestCacheKey::test_different_temperature_produces_different_key PASSED [ 79%]
+
+tests/unit/test_llm_client.py::TestCacheKey::test_different_content_produces_different_key PASSED [ 81%]
+
+tests/unit/test_llm_client.py::TestCacheKey::test_key_is_64_hex_chars PASSED [ 83%]
+
+tests/unit/test_llm_client.py::TestOpenAIClientRetry::test_auth_error_is_not_retried PASSED [ 85%]
+
+tests/unit/test_llm_client.py::TestOpenAIClientRetry::test_rate_limit_is_retried PASSED [ 87%]
+
+tests/unit/test_llm_client.py::TestOpenAIClientRetry::test_exhausted_retries_raise_transient_error PASSED [ 88%]
+
+tests/unit/test_logging.py::TestJSONLogging::test_get_logger_returns_standard_logger PASSED [ 90%]
+
+tests/unit/test_logging.py::TestJSONLogging::test_configure_logging_is_idempotent PASSED [ 92%]
+
+tests/unit/test_logging.py::TestJSONLogging::test_file_handler_created_when_log_dir_provided PASSED [ 94%]
+
+tests/unit/test_logging.py::TestAuditLogger::test_audit_entries_are_written_as_jsonl PASSED [ 96%]
+
+tests/unit/test_logging.py::TestAuditLogger::test_audit_logger_appends_not_overwrites PASSED [ 98%]
+
+tests/unit/test_logging.py::TestAuditLogger::test_audit_logger_context_manager PASSED [100%]
+
+ERROR: Coverage failure: total of 50 is less than fail-under=80
+
+
+
+
+
+================================ tests coverage ================================
+
+_______________ coverage: platform linux, python 3.11.15-final-0 _______________
+
+
+
+Coverage XML written to file coverage.xml
+
+FAIL Required test coverage of 80.0% not reached. Total coverage: 50.17%
+
+============================== 54 passed in 2.19s ==============================
+
+Error: Process completed with exit code 1.
+

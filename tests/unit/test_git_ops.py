@@ -53,7 +53,8 @@ class TestGitClientWithRealRepo:
         repo.mkdir()
         subprocess.run(["git", "init", "-b", "main"], cwd=repo, check=True, capture_output=True)
         subprocess.run(
-            ["git", "config", "user.email", "test@test.com"], cwd=repo, check=True, capture_output=True
+            ["git", "config", "user.email", "test@test.com"],
+            cwd=repo, check=True, capture_output=True,
         )
         subprocess.run(
             ["git", "config", "user.name", "Test User"], cwd=repo, check=True, capture_output=True

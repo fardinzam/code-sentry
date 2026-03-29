@@ -22,7 +22,7 @@ class SearchResult:
         symbol_name: Function/class name if available.
         start_line: 1-indexed start line.
         end_line: 1-indexed end line.
-        score: Combined relevance score 0.0–1.0 (higher = more relevant).
+        score: Combined relevance score 0.0-1.0 (higher = more relevant).
         metadata: Full metadata dict from the vector store.
     """
 

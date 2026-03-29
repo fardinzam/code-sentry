@@ -46,7 +46,7 @@ def _format_search_results(results: list[SearchResult]) -> str:
         header = f"### [{i + 1}] {r.file_path}"
         if r.symbol_name:
             header += f" — `{r.symbol_name}`"
-        header += f" (lines {r.start_line}–{r.end_line}, score={r.score:.2f})"
+        header += f" (lines {r.start_line}-{r.end_line}, score={r.score:.2f})"
         parts.append(f"{header}\n```\n{r.text}\n```")
     return "\n\n".join(parts)
 
@@ -57,7 +57,8 @@ def _build_file_tree(repo_root: Path, max_lines: int = 60) -> str:
     for dirpath, dirnames, filenames in os.walk(repo_root):
         dirnames[:] = sorted(
             d for d in dirnames
-            if not d.startswith(".") and d not in {"__pycache__", "node_modules", ".venv", "venv", "dist"}
+            if not d.startswith(".")
+            and d not in {"__pycache__", "node_modules", ".venv", "venv", "dist"}
         )
         depth = Path(dirpath).relative_to(repo_root).parts
         indent = "  " * len(depth)

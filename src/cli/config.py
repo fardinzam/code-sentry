@@ -9,6 +9,11 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from src.config.settings import (
+    get_settings,
+)
+from src.utils.constants import SENSITIVE_KEY_FRAGMENTS
+
 app = typer.Typer(help="Manage code-reviewer configuration.")
 console = Console()
 
@@ -18,8 +23,6 @@ def config_show(
     repo_path: str = typer.Option(".", help="Repository path."),
 ) -> None:
     """Print the resolved configuration (sensitive values masked)."""
-    from src.config.settings import get_settings, SENSITIVE_KEY_FRAGMENTS
-
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         settings = get_settings(Path(repo_path).resolve())
@@ -74,22 +77,18 @@ def config_validate(
     repo_path: str = typer.Option(".", help="Repository path."),
 ) -> None:
     """Validate the configuration for errors."""
-    import warnings
-    from pydantic import ValidationError
-
     try:
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
-            from src.config.settings import get_settings
             get_settings(Path(repo_path).resolve())
 
         if caught:
             console.print("[yellow]Warnings:[/]")
             for w in caught:
-                console.print(f"  ⚠  {w.message}")
+                console.print(f"  \u26a0  {w.message}")
 
-        console.print("[green]✓[/] Configuration is valid.")
+        console.print("[green]\u2713[/] Configuration is valid.")
 
     except Exception as exc:
-        console.print(f"[red]✗ Configuration error:[/] {exc}")
-        raise typer.Exit(1)
+        console.print(f"[red]\u2717 Configuration error:[/] {exc}")
+        raise typer.Exit(1) from exc

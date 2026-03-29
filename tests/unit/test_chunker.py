@@ -4,18 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from src.indexing.chunker import (
-    Chunk,
     _estimate_tokens,
     _markdown_chunks,
-    _paragraph_chunks,
-    _single_chunk,
     chunk_file,
 )
-from src.utils.constants import MAX_CHUNK_TOKENS, MIN_CHUNK_TOKENS
-
 
 # ─── Test fixtures ────────────────────────────────────────────────────────────
 

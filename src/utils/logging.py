@@ -19,7 +19,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-
 # ─── JSON formatter ──────────────────────────────────────────────────────────
 
 
@@ -151,7 +150,7 @@ class AuditLogger:
         """Close the audit file. Call when the task completes."""
         self._file.close()
 
-    def __enter__(self) -> "AuditLogger":
+    def __enter__(self) -> AuditLogger:
         return self
 
     def __exit__(self, *_: object) -> None:

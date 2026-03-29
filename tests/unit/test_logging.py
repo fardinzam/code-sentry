@@ -6,8 +6,6 @@ import json
 import logging
 from pathlib import Path
 
-import pytest
-
 from src.utils.logging import AuditLogger, configure_logging, get_logger
 
 
@@ -21,8 +19,8 @@ class TestJSONLogging:
 
     def test_configure_logging_is_idempotent(self, tmp_path: Path) -> None:
         """Calling configure_logging twice should not add duplicate handlers."""
-        # Reset for this test
         import src.utils.logging as log_module
+
         log_module._configured = False
         root = logging.getLogger()
         initial_handlers = len(root.handlers)
@@ -41,6 +39,7 @@ class TestJSONLogging:
 
     def test_file_handler_created_when_log_dir_provided(self, tmp_path: Path) -> None:
         import src.utils.logging as log_module
+
         log_module._configured = False
 
         configure_logging(level="INFO", fmt="json", log_dir=tmp_path)

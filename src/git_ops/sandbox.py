@@ -8,7 +8,6 @@ rollback on failure and cleanup of stale branches.
 from __future__ import annotations
 
 import time
-from pathlib import Path
 
 from src.git_ops.client import GitClient, make_sandbox_branch_name
 from src.utils.errors import DiffApplicationError, GitError, SandboxError

@@ -18,7 +18,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
 from src.indexing.parser import CodeSymbol, ParseError, parse_python_file
 from src.utils.constants import (
@@ -179,10 +178,9 @@ def _chunk_symbols(
                 idx += 1
 
         # Classes: whole class if small, else split into method chunks
-        elif symbol.symbol_type == "class":
-            if tokens <= MAX_CHUNK_TOKENS:
-                chunks.append(_symbol_to_chunk(symbol, file_path, language, idx, lines))
-                idx += 1
+        elif symbol.symbol_type == "class" and tokens <= MAX_CHUNK_TOKENS:
+            chunks.append(_symbol_to_chunk(symbol, file_path, language, idx, lines))
+            idx += 1
             # If too large, the individual method symbols were already added above
 
     return chunks
@@ -206,7 +204,8 @@ def _line_based_chunks(
         text_part = "".join(group)
         if not text_part.strip():
             continue
-        before, after = _get_context_lines(lines, start, min(start + target_lines - 1, len(lines) - 1))
+        target_end = min(start + target_lines - 1, len(lines) - 1)
+        before, after = _get_context_lines(lines, start, target_end)
         chunks.append(
             Chunk(
                 text=text_part,
@@ -234,7 +233,13 @@ def _markdown_chunks(text: str, file_path: str) -> list[Chunk]:
     chunks: list[Chunk] = []
     line_cursor = 1
 
-    for idx, (heading, body) in enumerate(zip([""] + headings, splits if not headings else [""] + splits)):
+    for idx, (heading, body) in enumerate(
+        zip(
+            ["", *headings],
+            ["", *splits] if headings else splits,
+            strict=False,
+        )
+    ):
         combined = (heading + "\n" + body).strip()
         if not combined:
             continue

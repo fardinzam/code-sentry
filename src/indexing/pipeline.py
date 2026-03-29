@@ -10,26 +10,24 @@ import fnmatch
 import json
 import os
 import time
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 from src.config.settings import IndexingSettings
-from src.indexing.chunker import Chunk, chunk_file
+from src.indexing.chunker import chunk_file
 from src.indexing.embedder import EmbeddingClient
 from src.indexing.vectordb import VectorDBClient
-from src.utils.constants import (
-    MAX_FILE_COUNT_HARD,
-    MAX_FILE_COUNT_WARN,
-    MAX_FILE_TOKENS,
-)
-from src.utils.errors import IndexingError, RepositoryTooLargeError
+from src.utils.constants import MAX_FILE_COUNT_HARD, MAX_FILE_COUNT_WARN
+from src.utils.errors import RepositoryTooLargeError
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
 _BINARY_EXTENSIONS: frozenset[str] = frozenset(
-    {".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".mp4", ".mp3",
-     ".pdf", ".zip", ".tar", ".gz", ".whl", ".egg", ".pyc", ".so", ".dll"}
+    {
+        ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".mp4", ".mp3",
+        ".pdf", ".zip", ".tar", ".gz", ".whl", ".egg", ".pyc", ".so", ".dll",
+    }
 )
 
 
@@ -72,7 +70,6 @@ def _discover_files(
     """Yield all indexable files in the repository."""
     for dirpath, dirnames, filenames in os.walk(repo_root):
         current = Path(dirpath)
-        # Skip hidden dirs and common non-source dirs
         dirnames[:] = [
             d for d in dirnames
             if not d.startswith(".")
@@ -90,9 +87,9 @@ def _discover_files(
             if _is_ignored(file_path, repo_root, ignore_patterns):
                 continue
 
-            # Resolve symlinks for depth check
+            # Validate path is resolvable (catches broken symlinks)
             try:
-                resolved = file_path.resolve()
+                file_path.resolve()
             except OSError:
                 continue
 
@@ -112,7 +109,7 @@ def _validate_repo_size(files: list[Path], repo_root: Path) -> None:
         )
     if count > MAX_FILE_COUNT_WARN:
         logger.warning(
-            "Large repository detected — indexing may take >10 minutes",
+            "Large repository detected - indexing may take >10 minutes",
             extra={"file_count": count},
         )
 
@@ -125,27 +122,37 @@ class _Checkpoint:
 
     def __init__(self, path: Path) -> None:
         self._path = path
-        self._data: dict[str, object] = self._load()
+        self._completed: list[str] = []
+        self._total_chunks: int = 0
+        self._load()
 
-    def _load(self) -> dict[str, object]:
+    def _load(self) -> None:
         if self._path.exists():
             try:
-                return json.loads(self._path.read_text())
+                data: dict[str, object] = json.loads(self._path.read_text())
+                completed = data.get("completed_files", [])
+                self._completed = list(completed) if isinstance(completed, list) else []
+                total = data.get("total_chunks", 0)
+                self._total_chunks = int(total) if isinstance(total, (int, float)) else 0
             except Exception:
                 pass
-        return {"completed_files": [], "total_chunks": 0}
 
     def is_done(self, file_path: str) -> bool:
-        return file_path in self._data.get("completed_files", [])
+        return file_path in self._completed
 
     def mark_done(self, file_path: str, chunk_count: int) -> None:
-        files: list[str] = self._data.setdefault("completed_files", [])  # type: ignore[assignment]
-        files.append(file_path)
-        self._data["total_chunks"] = int(self._data.get("total_chunks", 0)) + chunk_count
-        self._path.write_text(json.dumps(self._data, indent=2))
+        self._completed.append(file_path)
+        self._total_chunks += chunk_count
+        self._path.write_text(
+            json.dumps(
+                {"completed_files": self._completed, "total_chunks": self._total_chunks},
+                indent=2,
+            )
+        )
 
     def clear(self) -> None:
-        self._data = {"completed_files": [], "total_chunks": 0}
+        self._completed = []
+        self._total_chunks = 0
         if self._path.exists():
             self._path.unlink()
 
@@ -154,7 +161,7 @@ class _Checkpoint:
 
 
 class IndexingPipeline:
-    """Orchestrates the full parse → chunk → embed → store pipeline.
+    """Orchestrates the full parse -> chunk -> embed -> store pipeline.
 
     Args:
         repo_root: Root of the repository to index.
@@ -197,7 +204,7 @@ class IndexingPipeline:
         )
         _validate_repo_size(all_files, self._repo)
 
-        stats = {"files_processed": 0, "chunks_created": 0, "files_skipped": 0}
+        stats: dict[str, int] = {"files_processed": 0, "chunks_created": 0, "files_skipped": 0}
         start_time = time.monotonic()
 
         logger.info(
@@ -222,7 +229,7 @@ class IndexingPipeline:
             estimated_tokens = len(text) // 4
             if estimated_tokens > self._settings.max_file_tokens:
                 logger.warning(
-                    "File exceeds max_file_tokens — skipping",
+                    "File exceeds max_file_tokens - skipping",
                     extra={"file": rel, "estimated_tokens": estimated_tokens},
                 )
                 continue
@@ -242,7 +249,7 @@ class IndexingPipeline:
                 vectors = self._embedder.embed_batch([c.text for c in chunks])
             except Exception as exc:
                 logger.warning(
-                    "Embedding failed — skipping file",
+                    "Embedding failed - skipping file",
                     extra={"file": rel, "error": str(exc)},
                 )
                 continue
@@ -252,7 +259,7 @@ class IndexingPipeline:
                 self._vector_db.upsert_chunks(chunks, vectors)
             except Exception as exc:
                 logger.error(
-                    "Vector DB write failed — file not indexed",
+                    "Vector DB write failed - file not indexed",
                     extra={"file": rel, "error": str(exc)},
                 )
                 continue
@@ -273,6 +280,6 @@ class IndexingPipeline:
                     },
                 )
 
-        self._checkpoint.clear()  # remove checkpoint on successful completion
+        self._checkpoint.clear()
         logger.info("Indexing complete", extra=stats)
         return stats

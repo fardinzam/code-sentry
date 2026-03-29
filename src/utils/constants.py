@@ -6,7 +6,7 @@ All magic numbers and string literals live here. Never scatter them inline.
 # ─── Indexing ────────────────────────────────────────────────────────────────
 MIN_CHUNK_TOKENS: int = 30
 MAX_CHUNK_TOKENS: int = 1500
-TARGET_CHUNK_TOKENS: int = 650  # midpoint of 500–800 target range
+TARGET_CHUNK_TOKENS: int = 650  # midpoint of 500-800 target range
 CHUNK_CONTEXT_LINES: int = 3  # leading/trailing lines attached as metadata
 MAX_FILE_TOKENS: int = 50_000
 MAX_FILE_COUNT_WARN: int = 50_000

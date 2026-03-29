@@ -14,7 +14,7 @@ read from config files. If present, the system logs a warning and ignores them.
 from __future__ import annotations
 
 import logging
-import os
+
 try:
     import tomllib
 except ImportError:  # Python < 3.11
@@ -80,7 +80,10 @@ class IndexingSettings(BaseSettings):
     max_file_tokens: int = 50_000
     context_lines: int = 3
     include_extensions: list[str] = Field(
-        default=[".py", ".js", ".ts", ".java", ".go", ".rs", ".md", ".txt", ".yaml", ".toml", ".json"]
+        default=[
+            ".py", ".js", ".ts", ".java", ".go", ".rs",
+            ".md", ".txt", ".yaml", ".toml", ".json",
+        ]
     )
 
 
@@ -130,7 +133,7 @@ class ScoringSettings(BaseSettings):
         return v
 
     @model_validator(mode="after")
-    def _weights_must_sum_to_one(self) -> "ScoringSettings":
+    def _weights_must_sum_to_one(self) -> ScoringSettings:
         total = (
             self.weight_correctness
             + self.weight_readability

@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import typer
 from rich.console import Console
+
+from src.config.settings import get_settings
+from src.indexing.embedder import make_embedding_client
+from src.indexing.pipeline import IndexingPipeline
+from src.indexing.vectordb import ChromaDBClient
+from src.utils.logging import configure_logging
 
 app = typer.Typer(help="Index a repository's codebase.")
 console = Console()
@@ -31,7 +38,6 @@ def index_run(
 
 def _show_status(repo_path: str) -> None:
     """Display current indexing statistics from the checkpoint file."""
-    import json
 
     checkpoint = Path(repo_path) / ".code-reviewer" / "index_checkpoint.json"
     if not checkpoint.exists():
@@ -39,20 +45,13 @@ def _show_status(repo_path: str) -> None:
         return
 
     data = json.loads(checkpoint.read_text())
-    console.print(f"[bold]Indexing Status[/] (in progress / last checkpoint)")
+    console.print("[bold]Indexing Status[/] (in progress / last checkpoint)")
     console.print(f"  Files indexed: [cyan]{len(data.get('completed_files', []))}[/]")
     console.print(f"  Total chunks:  [cyan]{data.get('total_chunks', 0)}[/]")
 
 
 def _run_index(repo_path: str, resume: bool) -> None:
     """Execute the indexing pipeline."""
-    import os
-    from src.config.settings import get_settings
-    from src.indexing.embedder import make_embedding_client
-    from src.indexing.vectordb import ChromaDBClient
-    from src.indexing.pipeline import IndexingPipeline
-    from src.utils.logging import configure_logging
-
     repo = Path(repo_path).resolve()
     cr_dir = repo / ".code-reviewer"
     cr_dir.mkdir(parents=True, exist_ok=True)
@@ -88,11 +87,11 @@ def _run_index(repo_path: str, resume: bool) -> None:
     try:
         stats = pipeline.run(resume=resume)
         console.print(
-            f"[green]✓[/] Indexing complete: "
+            f"[green]\u2713[/] Indexing complete: "
             f"[cyan]{stats['files_processed']}[/] files, "
             f"[cyan]{stats['chunks_created']}[/] chunks "
             f"([dim]{stats['files_skipped']} skipped[/])"
         )
     except Exception as exc:
-        console.print(f"[red]✗ Indexing failed:[/] {exc}")
-        raise typer.Exit(1)
+        console.print(f"[red]\u2717 Indexing failed:[/] {exc}")
+        raise typer.Exit(1) from exc

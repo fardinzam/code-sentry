@@ -4,15 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import time
 from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 
-from src.utils.constants import (
-    HIGH_TEMPERATURE_CACHE_BYPASS,
-    LLM_CACHE_TTL_HOURS,
-)
 from src.utils.errors import LLMAuthError, LLMBudgetExhaustedError, LLMError, TransientError
 from src.utils.logging import get_logger
 
@@ -86,7 +81,7 @@ class OpenAIClient:
         timeout: int = 120,
     ) -> None:
         try:
-            from openai import OpenAI  # type: ignore[import-untyped]
+            from openai import OpenAI
         except ImportError as exc:
             raise ImportError("openai package required: pip install openai") from exc
 
@@ -102,7 +97,6 @@ class OpenAIClient:
         extra: dict[str, Any] = {}
         if json_mode:
             extra["response_format"] = {"type": "json_object"}
-
         for attempt in range(self._max_retries):
             try:
                 start = time.monotonic()

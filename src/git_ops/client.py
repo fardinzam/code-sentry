@@ -208,7 +208,7 @@ class GitClient:
         Returns:
             Tuple of (success: bool, error_message: str).
         """
-        result = _run(
+        _run(
             ["apply", "--check", "--3way"],
             cwd=self._repo,
             check=False,

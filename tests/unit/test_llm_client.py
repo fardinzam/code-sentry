@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
 import time
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from src.llm.client import (
-    LLMResponse,
     OpenAIClient,
     TokenBudgetTracker,
     _make_cache_key,
@@ -31,7 +31,6 @@ class TestTokenBudgetTracker:
             tracker.record(1_001)
 
     def test_warning_logged_at_80_percent(self, caplog: pytest.LogCaptureFixture) -> None:
-        import logging
         tracker = TokenBudgetTracker(max_tokens=1_000, warn_at_percent=0.8)
         with caplog.at_level(logging.WARNING, logger="src.llm.client"):
             tracker.record(800)
@@ -39,10 +38,8 @@ class TestTokenBudgetTracker:
 
     def test_remaining_never_goes_negative(self) -> None:
         tracker = TokenBudgetTracker(max_tokens=100)
-        try:
+        with contextlib.suppress(LLMBudgetExhaustedError):
             tracker.record(200)
-        except LLMBudgetExhaustedError:
-            pass
         assert tracker.remaining == 0
 
 
@@ -78,8 +75,7 @@ class TestOpenAIClientRetry:
     """Verify retry behaviour on rate limits and auth errors."""
 
     def _make_client(self) -> OpenAIClient:
-        client = OpenAIClient(model="gpt-4o", api_key="test")
-        return client
+        return OpenAIClient(model="gpt-4o", api_key="test")
 
     def test_auth_error_is_not_retried(self) -> None:
         client = self._make_client()
@@ -90,9 +86,11 @@ class TestOpenAIClientRetry:
             call_count[0] += 1
             raise Exception("401 Unauthorized: invalid_api_key")
 
-        with patch.object(client._client.chat.completions, "create", side_effect=fake_create):
-            with pytest.raises(LLMAuthError):
-                client.generate([{"role": "user", "content": "hi"}])
+        with (
+            patch.object(client._client.chat.completions, "create", side_effect=fake_create),
+            pytest.raises(LLMAuthError),
+        ):
+            client.generate([{"role": "user", "content": "hi"}])
 
         # Auth errors must NOT be retried
         assert call_count[0] == 1
@@ -124,10 +122,15 @@ class TestOpenAIClientRetry:
         client = self._make_client()
         monkeypatch.setattr(time, "sleep", lambda _: None)
 
-        with patch.object(
-            client._client.chat.completions,
-            "create",
-            side_effect=Exception("429 rate limit"),
+        with (
+            patch.object(
+                client._client.chat.completions,
+                "create",
+                side_effect=Exception("429 rate limit"),
+            ),
+            pytest.raises(TransientError),
         ):
-            with pytest.raises(TransientError):
-                client.generate([{"role": "user", "content": "hi"}])
+            client.generate([{"role": "user", "content": "hi"}])
+
+
+import logging  # noqa: E402 — must be after class to avoid circular import in tests

@@ -1,12 +1,11 @@
 """ChromaDB vector database integration (§7.1, §1.6).
 
 Provides a VectorDBClient interface and a ChromaDB implementation.
-All writes are batched per-file granularity — no partial writes.
+All writes are batched per-file granularity - no partial writes.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -63,7 +62,7 @@ class ChromaDBClient:
 
     def __init__(self, persist_directory: str, collection_name: str = "codebase") -> None:
         try:
-            import chromadb  # type: ignore[import-untyped]
+            import chromadb  # type: ignore[import-untyped,unused-ignore]
         except ImportError as exc:
             raise ImportError("chromadb package required: pip install chromadb") from exc
 
@@ -100,7 +99,8 @@ class ChromaDBClient:
 
         ids = [f"{c.file_path}::{c.chunk_index}" for c in chunks]
         texts = [c.text for c in chunks]
-        metadatas = [
+        # ChromaDB metadata values must be str | int | float | bool - cast accordingly.
+        metadatas: list[dict[str, str | int | float | bool]] = [
             {
                 "file_path": c.file_path,
                 "language": c.language,
@@ -110,18 +110,21 @@ class ChromaDBClient:
                 "start_line": c.start_line,
                 "end_line": c.end_line,
                 "estimated_tokens": c.estimated_tokens,
-                "context_before": c.context_before[:200],  # truncate for storage
+                "context_before": c.context_before[:200],
                 "context_after": c.context_after[:200],
             }
             for c in chunks
         ]
+        # Embeddings passed as list[list[float]] - ChromaDB accepts this at runtime
+        # even though its stub uses ndarray. Cast via Any to satisfy mypy.
+        embeddings: Any = vectors
 
         try:
             self._collection.upsert(
                 ids=ids,
-                embeddings=vectors,
+                embeddings=embeddings,
                 documents=texts,
-                metadatas=metadatas,
+                metadatas=metadatas,  # type: ignore[arg-type]
             )
         except Exception as exc:
             raise VectorDBError(f"ChromaDB upsert failed: {exc}") from exc
@@ -151,19 +154,26 @@ class ChromaDBClient:
             if where:
                 kwargs["where"] = where
 
-            result = self._collection.query(**kwargs)
+            from typing import cast
+            result: dict[str, Any] = cast(dict[str, Any], self._collection.query(**kwargs))
         except Exception as exc:
             raise VectorDBError(f"ChromaDB query failed: {exc}") from exc
 
         results: list[dict[str, Any]] = []
-        if not result["ids"] or not result["ids"][0]:
+        ids_outer: list[list[str]] | None = result.get("ids")
+        if not ids_outer or not ids_outer[0]:
             return results
 
+        docs_outer: list[list[str]] = result.get("documents") or [[]]
+        metas_outer: list[list[dict[str, Any]]] = result.get("metadatas") or [[]]
+        dists_outer: list[list[float]] = result.get("distances") or [[]]
+
         for doc_id, text, meta, dist in zip(
-            result["ids"][0],
-            result["documents"][0],
-            result["metadatas"][0],
-            result["distances"][0],
+            ids_outer[0],
+            docs_outer[0],
+            metas_outer[0],
+            dists_outer[0],
+            strict=False,
         ):
             results.append({"id": doc_id, "text": text, "metadata": meta, "distance": dist})
 

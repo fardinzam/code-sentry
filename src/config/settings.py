@@ -18,7 +18,7 @@ import logging
 try:
     import tomllib
 except ImportError:  # Python < 3.11
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib  # type: ignore[import-not-found,no-redef,unused-ignore]
 import warnings
 from pathlib import Path
 from typing import Any

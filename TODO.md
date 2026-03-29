@@ -259,21 +259,21 @@
 
 ### 2.2 ReAct Agent Loop (§7.3, §7.10.5)
 
-- [ ] Implement agent orchestrator (`src/agent/orchestrator.py`):
-  - [ ] Main loop: assemble prompt → call LLM → parse response → execute tool → capture observation → repeat
-  - [ ] Iteration counter with `remaining_iterations` passed to each prompt
-  - [ ] Max iteration enforcement (default: 15, configurable)
-  - [ ] Token budget tracking per task (cumulative across iterations)
-  - [ ] Final iteration forcing: "Submit your best proposal now or give up"
-  - [ ] `give_up` handling: terminate gracefully, log reasoning, mark FAILED
-- [ ] Implement conversation history management:
-  - [ ] Append `{ thought, action, observation }` per iteration
-  - [ ] Summarize oldest iterations when history exceeds Stage 4 token budget
-  - [ ] Always keep the 3 most recent iterations in full
-- [ ] Implement structured output parsing (§7.10.3):
-  - [ ] Parse LLM JSON response via Pydantic validators
-  - [ ] Validation failure retry chain: re-prompt with error (attempt 1) → salvage partial (attempt 2) → mark FAILED (attempt 3)
-  - [ ] Use `response_format: json_object` when supported by provider
+- [x] Implement agent orchestrator (`src/agent/orchestrator.py`):
+  - [x] Main loop: assemble prompt → call LLM → parse response → execute tool → capture observation → repeat
+  - [x] Iteration counter with `remaining_iterations` passed to each prompt
+  - [x] Max iteration enforcement (default: 15, configurable)
+  - [x] Token budget tracking per task (cumulative across iterations)
+  - [x] Final iteration forcing: "Submit your best proposal now or give up"
+  - [x] `give_up` handling: terminate gracefully, log reasoning, mark FAILED
+- [x] Implement conversation history management:
+  - [x] Append `{ thought, action, observation }` per iteration
+  - [x] Summarize oldest iterations when history exceeds Stage 4 token budget
+  - [x] Always keep the 3 most recent iterations in full
+- [x] Implement structured output parsing (§7.10.3):
+  - [x] Parse LLM JSON response via Pydantic validators
+  - [x] Validation failure retry chain: re-prompt with error (attempt 1) → salvage partial (attempt 2) → mark FAILED (attempt 3)
+  - [x] Use `response_format: json_object` when supported by provider
 
 ### 2.3 Agent Tools (§7.3 FR-3.2)
 

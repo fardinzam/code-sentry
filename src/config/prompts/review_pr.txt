@@ -1,0 +1,24 @@
+TASK TYPE: REVIEW_PR — Pull Request Critique
+
+OBJECTIVE:
+Review the provided diff in context of the full codebase. Identify bugs, style
+issues, performance concerns, and missing edge cases. Produce inline comments
+keyed to file:line. Rate overall quality.
+
+REVIEW CHECKLIST:
+- **Correctness**: Logic errors, off-by-one, null/None handling, race conditions.
+- **Security**: Injection flaws, credential exposure, unsafe deserialization.
+- **Performance**: Unnecessary allocations, N+1 queries, missing caching.
+- **Style**: Naming conventions (PEP 8), dead code, overly complex expressions.
+- **Edge Cases**: Missing input validation, error handling, boundary conditions.
+- **Test Coverage**: Are the changes adequately covered by tests?
+
+RULES:
+1. Be specific — reference exact file paths, line numbers, and variable names.
+2. Explain *why* each issue matters, not just *what* is wrong.
+3. Categorize every finding by severity (critical / warning / info).
+4. Do NOT rewrite the PR. Only describe issues and suggest improvements.
+5. If the code is well-written and you find no issues, say so explicitly.
+   Do not invent problems.
+6. Assign a quality score (0-100) reflecting the overall PR quality.
+7. Give a final verdict: APPROVE, REQUEST_CHANGES, or COMMENT.

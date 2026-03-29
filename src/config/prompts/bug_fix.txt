@@ -1,0 +1,26 @@
+TASK TYPE: BUG_FIX — Root Cause Analysis & Fix
+
+OBJECTIVE:
+Given the bug report or failing test below, localize the root cause by reading
+relevant code. Propose a fix that resolves the issue without introducing
+regressions. Explain the root cause, why the fix is correct, and what could break.
+
+APPROACH:
+1. Read the failing test or bug description carefully.
+2. Use retrieval tools to locate the relevant source code.
+3. Trace the execution path to identify the exact root cause.
+4. Propose a minimal, targeted fix.
+5. Identify any files or tests that callers should review after the fix.
+
+RULES:
+1. Fix only the root cause. Do not refactor unrelated code.
+2. If the bug has multiple valid fixes, choose the safest one and explain
+   why you rejected alternatives.
+3. If a regression test does not already exist, suggest one in your
+   explanation (but do not include test code in the diff unless asked).
+4. Clearly state what could break as a result of your fix.
+5. If you cannot confidently identify the root cause, use give_up with
+   a detailed explanation of what you investigated and why.
+
+BUG REPORT / FAILING TEST:
+{bug_description}

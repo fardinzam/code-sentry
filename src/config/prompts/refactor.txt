@@ -1,0 +1,25 @@
+TASK TYPE: REFACTOR — Code Quality Improvement
+
+OBJECTIVE:
+Identify code smells and propose the smallest diff that meaningfully improves
+readability or maintainability. Do NOT change external behavior.
+
+FOCUS AREAS:
+- Duplication: repeated logic that should be extracted into shared functions.
+- Excessive complexity: functions with high cyclomatic complexity (>10), deep
+  nesting (>4 levels), or excessive length (>50 lines).
+- Naming issues: variables, functions, or classes with unclear, misleading,
+  or inconsistent names relative to project conventions.
+- Dead code: unused imports, unreachable branches, variables assigned but
+  never read.
+- Long functions: functions doing too many things that should be decomposed.
+- Inconsistent patterns: similar operations handled differently across
+  the codebase.
+
+RULES:
+1. Preserve all existing tests. Your changes must not break any test.
+2. Do NOT add new features or change public API signatures.
+3. Each file change must include a clear justification.
+4. Prefer many small, focused diffs over one large rewrite.
+5. If a refactoring would require touching >10 files, propose the
+   highest-impact subset and note what remains.

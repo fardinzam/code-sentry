@@ -241,21 +241,21 @@
 
 ### 2.1 System Prompt Templates (§7.10.1)
 
-- [ ] Create common preamble template (`config/prompts/system_common.txt`) with placeholder variables: `{repo_name}`, `{primary_language}`, `{default_branch}`, `{head_sha}`
-- [ ] Create task-specific prompt extensions:
-  - [ ] `config/prompts/refactor.txt` — code quality improvement instructions
-  - [ ] `config/prompts/bug_fix.txt` — root cause analysis + fix instructions
-  - [ ] `config/prompts/review_pr.txt` — PR critique instructions
-  - [ ] `config/prompts/health_scan.txt` — broad code health audit instructions
-  - [ ] `config/prompts/explain.txt` — code understanding instructions
-- [ ] Create few-shot examples:
-  - [ ] `config/prompts/examples/review_pr_example.json` — one-shot PR review example
-  - [ ] `config/prompts/examples/format_correction.json` — dynamic few-shot for validation failures
-- [ ] Implement prompt assembler (`src/agent/prompt_assembler.py`):
-  - [ ] Load system prompt templates and fill placeholders
-  - [ ] Select task-specific extension based on `task_type`
-  - [ ] Inject few-shot examples when appropriate (§7.10.4)
-  - [ ] Wire into the 5-stage prompt construction pipeline (§7.10.2)
+- [x] Create common preamble template (`config/prompts/system_common.txt`) with placeholder variables: `{repo_name}`, `{primary_language}`, `{default_branch}`, `{head_sha}`
+- [x] Create task-specific prompt extensions:
+  - [x] `config/prompts/refactor.txt` — code quality improvement instructions
+  - [x] `config/prompts/bug_fix.txt` — root cause analysis + fix instructions
+  - [x] `config/prompts/review_pr.txt` — PR critique instructions
+  - [x] `config/prompts/health_scan.txt` — broad code health audit instructions
+  - [x] `config/prompts/explain.txt` — code understanding instructions
+- [x] Create few-shot examples:
+  - [x] `config/prompts/examples/review_pr_example.json` — one-shot PR review example
+  - [x] `config/prompts/examples/format_correction.json` — dynamic few-shot for validation failures
+- [x] Implement prompt assembler (`src/agent/prompt_assembler.py`):
+  - [x] Load system prompt templates and fill placeholders
+  - [x] Select task-specific extension based on `task_type`
+  - [x] Inject few-shot examples when appropriate (§7.10.4)
+  - [x] Wire into the 5-stage prompt construction pipeline (§7.10.2)
 
 ### 2.2 ReAct Agent Loop (§7.3, §7.10.5)
 

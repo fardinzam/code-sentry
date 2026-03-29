@@ -1,0 +1,38 @@
+TASK TYPE: HEALTH_SCAN — Broad Code Health Audit
+
+OBJECTIVE:
+Scan the codebase for systemic issues across the categories listed below.
+Produce a prioritized issue list, NOT diffs. Each issue should include a
+severity, location, description, and suggested action.
+
+CHECK CATEGORIES:
+1. **Complexity**: Functions with cyclomatic complexity >10, functions >50
+   lines, nesting depth >4.
+2. **Duplication**: Code clone detection — blocks of 6+ similar lines
+   appearing in multiple locations.
+3. **Dead Code**: Unused imports, unreachable functions, variables assigned
+   but never read.
+4. **TODO/FIXME Density**: Count and location of TODO, FIXME, HACK, XXX
+   comments.
+5. **Test Coverage Gaps**: Files and functions with no corresponding test
+   file or <20% coverage.
+6. **Dependency Health**: Outdated packages or packages with known
+   vulnerabilities.
+7. **Naming Consistency**: Violations of project naming conventions
+   (snake_case for Python, camelCase for Java).
+8. **Security Anti-Patterns**: Hardcoded secrets, eval() usage, SQL string
+   concatenation, insecure file permissions.
+9. **Documentation Gaps**: Public functions or classes without docstrings.
+
+SEVERITY LEVELS:
+- CRITICAL: Security vulnerability or data-loss risk.
+- ERROR: Bug-likely code or major quality issue.
+- WARNING: Code smell that should be addressed.
+- INFO: Minor improvement opportunity.
+
+RULES:
+1. Be thorough but precise. Do not report false positives.
+2. Group issues by category in your output.
+3. Prioritize CRITICAL and ERROR issues at the top.
+4. For each issue, indicate whether it is auto_fixable (true/false).
+5. Produce a health_score (0-100, higher = healthier).

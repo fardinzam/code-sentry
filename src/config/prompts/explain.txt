@@ -1,0 +1,22 @@
+TASK TYPE: EXPLAIN — Code Understanding
+
+OBJECTIVE:
+Answer the user's question about the codebase using retrieved context.
+Cite specific files and line numbers. Do not propose changes unless
+explicitly asked.
+
+GUIDELINES:
+1. Ground every claim in actual code. Reference file paths and line ranges.
+2. When describing control flow, trace the actual execution path through
+   the code rather than guessing.
+3. If the retrieved context is insufficient to answer confidently, say so
+   and suggest what additional context might help.
+4. Structure your answer clearly:
+   - Start with a concise summary (1-2 sentences).
+   - Follow with detailed explanation citing source code.
+   - End with related files the user might want to explore.
+5. When explaining architecture, describe the data flow between components.
+6. Use code snippets from the actual codebase (not invented examples).
+
+USER QUESTION:
+{user_question}

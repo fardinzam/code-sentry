@@ -277,20 +277,20 @@
 
 ### 2.3 Agent Tools (§7.3 FR-3.2)
 
-- [ ] Implement tool registry (`src/agent/tools/registry.py`):
-  - [ ] Register tools by name with input/output schemas
-  - [ ] Dispatch tool calls from agent responses
-  - [ ] Capture tool output as observation string
-- [ ] Implement individual tools:
-  - [ ] `file_read(path, start_line, end_line)` — read file contents from the repo
-  - [ ] `vector_search(query, top_k)` — semantic search over indexed codebase
-  - [ ] `ast_query(file_path, symbol_name)` — query AST for function/class definitions, callers
-  - [ ] `file_write(path, content)` — write to file **within sandbox branch only**
-  - [ ] `shell_exec(command)` — run sandboxed shell command (with allowlist)
-  - [ ] `git_op(operation, args)` — Git operations (diff, log, show)
-  - [ ] `submit_proposal(proposal_json)` — submit final proposal
-  - [ ] `give_up(reason)` — terminate task gracefully
-- [ ] Sandbox enforcement: `file_write` and `shell_exec` reject operations outside the repo directory
+- [x] Implement tool registry (`src/agent/tools/registry.py`):
+  - [x] Register tools by name with input/output schemas
+  - [x] Dispatch tool calls from agent responses
+  - [x] Capture tool output as observation string
+- [x] Implement individual tools:
+  - [x] `file_read(path, start_line, end_line)` — read file contents from the repo
+  - [x] `vector_search(query, top_k)` — semantic search over indexed codebase
+  - [x] `ast_query(file_path, symbol_name)` — query AST for function/class definitions, callers
+  - [x] `file_write(path, content)` — write to file **within sandbox branch only**
+  - [x] `shell_exec(command)` — run sandboxed shell command (with allowlist)
+  - [x] `git_op(operation, args)` — Git operations (diff, log, show)
+  - [x] `submit_proposal(proposal_json)` — submit final proposal
+  - [x] `give_up(reason)` — terminate task gracefully
+- [x] Sandbox enforcement: `file_write` and `shell_exec` reject operations outside the repo directory
 
 ### 2.4 Proposal Schema & Validation (§10.3)
 
